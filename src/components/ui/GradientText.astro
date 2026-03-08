@@ -1,0 +1,24 @@
+---
+interface Props {
+  colors?: string[];
+  animationSpeed?: number;
+  class?: string;
+  showBorder?: boolean;
+}
+
+const {
+  colors = ["#ffaa40", "#9c40ff", "#ffaa40"],
+  animationSpeed = 8,
+  class: className = "",
+  showBorder = false,
+} = Astro.props;
+
+const gradient = `linear-gradient(to right, ${colors.join(", ")})`;
+---
+
+<span
+  class:list={["gradient-text-animated", className]}
+  style={`background-image: ${gradient}; --anim-speed: ${animationSpeed}s;`}
+>
+  <slot />
+</span>

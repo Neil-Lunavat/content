@@ -1,0 +1,83 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import BlogNav from "../components/layout/BlogNav.astro";
+import BlogMeta from "../components/layout/BlogMeta.astro";
+import GradientText from "../components/ui/GradientText.astro";
+
+interface Props {
+  frontmatter: {
+    title: string;
+    description?: string;
+    ogImage?: string;
+    heroTitle: string;
+    subtitle: string;
+    pubDate: string;
+    readTime: number;
+    toc: { id: string; text: string }[];
+  };
+}
+
+const { frontmatter } = Astro.props;
+const pubDate = new Date(frontmatter.pubDate);
+---
+
+<BaseLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+  ogImage={frontmatter.ogImage}
+>
+  <div class="relative min-h-screen px-0 py-24 w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr_1fr] gap-0 w-full mx-auto">
+
+      <!-- Left: TOC -->
+      <div class="hidden lg:block m-10">
+        <div class="sticky top-24">
+          <BlogNav toc={frontmatter.toc} />
+        </div>
+      </div>
+
+      <!-- Center: Content -->
+      <div class="flex flex-col items-center px-4">
+        <div class="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 z-20">
+          <BlogMeta pubDate={pubDate} readTime={frontmatter.readTime} />
+        </div>
+
+        <div class="relative z-10 w-full">
+          <div class="max-w-4xl mx-auto">
+
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl mb-4 sm:mb-6 text-center px-2 font-bold" style="font-family: var(--font-serif);">
+              <GradientText colors={["#4C1D95", "#A855F7", "#C084FC"]} class="text-3xl sm:text-4xl lg:text-5xl">
+                {frontmatter.heroTitle}
+              </GradientText>
+            </h1>
+            <h2 class="text-3xl mb-6 text-center text-zinc-300" style="font-family: var(--font-serif);">
+              {frontmatter.subtitle}
+            </h2>
+
+            <article class="mt-12 text-zinc-200 leading-relaxed text-lg space-y-6">
+              <slot />
+            </article>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Support card -->
+      <div class="hidden lg:block m-10">
+        <div class="sticky top-24">
+          <div class="rounded-xl p-[1.5px] bg-gradient-to-br from-[#4C1D95] via-[#7C3AED] to-[#A855F7]">
+        <div class="bg-black rounded-xl p-6">
+          <div class="text-purple-400 text-4xl leading-none mb-3" style="font-family: var(--font-serif);">"</div>
+            <p class="text-zinc-300 text-lg leading-relaxed italic">
+            If you want to support me and my work, feel free to send me a message on any of my socials.
+            </p>
+          <div class="text-purple-400 text-4xl leading-none text-right mt-1" style="font-family: var(--font-serif);">"</div>
+          <p class="text-xs text-zinc-500 mt-4 text-right">— Neil Lunavat</p>
+        </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

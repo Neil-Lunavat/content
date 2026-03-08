@@ -1,0 +1,19 @@
+---
+interface Props {
+  pubDate: Date;
+  readTime: number;
+  views?: number;
+}
+
+const { pubDate, readTime, views } = Astro.props;
+
+const formatted = pubDate.toLocaleDateString(undefined, {
+  year: "numeric",
+  month: "short",
+  day: "2-digit",
+});
+---
+
+<div class="text-xs text-zinc-400" style="font-family: var(--font-sans, sans-serif);">
+  {formatted} &bull; {readTime} min read{views !== undefined ? ` • ${views} views` : ""}
+</div>

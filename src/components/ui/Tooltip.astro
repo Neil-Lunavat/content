@@ -1,0 +1,203 @@
+---
+interface Props {
+  definition: string;
+  link?: string;
+  pronunciation?: string;
+  imageUrl?: string;
+  imageAlt?: string;
+}
+
+const { definition, link = "", pronunciation = "", imageUrl = "", imageAlt = "" } = Astro.props;
+---
+
+<span
+  class="tooltip-trigger"
+  data-definition={definition}
+  data-link={link}
+  data-pronunciation={pronunciation}
+  data-image={imageUrl}
+  data-alt={imageAlt}
+  tabindex="0"
+  role="button"
+  style="border-bottom: 1px dotted #7C3AED; background: linear-gradient(135deg, #4C1D95, #7C3AED, #A855F7, #C084FC); -webkit-background-clip: text; background-clip: text; color: transparent; cursor: pointer;"
+>
+  <slot />
+</span>
+
+<script>
+  // Astro deduplicates this script — runs once per page
+  if (!(window as any).__tooltipInit) {
+    (window as any).__tooltipInit = true;
+
+    const tip = document.createElement("div");
+    tip.id = "global-tooltip";
+    tip.style.cssText =
+      "display:none; position:fixed; z-index:9999; max-width:calc(100vw - 16px); width:20rem; background:rgba(0,0,0,0.92); backdrop-filter:blur(12px); color:white; border-radius:0.75rem; box-shadow:0 25px 50px rgba(0,0,0,0.5); padding:1rem; border:1px solid #3f3f46;";
+    document.body.appendChild(tip);
+
+    let hideTimer: ReturnType<typeof setTimeout> | null = null;
+    let animTimer: ReturnType<typeof setTimeout> | null = null;
+    let currentTrigger: HTMLElement | null = null;
+
+    function cancelHide() {
+      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+      if (animTimer) { clearTimeout(animTimer); animTimer = null; }
+      tip.style.animation = "";
+    }
+
+    const isMobile = () => window.innerWidth < 768;
+
+    function buildTooltipHTML(trigger: HTMLElement): string {
+      const label = trigger.textContent?.trim() ?? "";
+      const def = trigger.dataset.definition ?? "";
+      const link = trigger.dataset.link ?? "";
+      const pronunciation = trigger.dataset.pronunciation ?? "";
+      const image = trigger.dataset.image ?? "";
+      const alt = trigger.dataset.alt ?? "";
+
+      let html = `<div style="margin-bottom:0.5rem;">
+        <h4 style="font-weight:600; color:white; font-size:1.125rem; font-family:var(--font-sans, sans-serif); margin:0 0 2px 0;">${label}</h4>`;
+      if (pronunciation) {
+        html += `<div style="color:#a1a1aa; font-size:0.75rem; font-style:italic;">/${pronunciation}/</div>`;
+      }
+      html += `</div>`;
+      if (image) {
+        html += `<div style="margin:0.5rem 0; border-radius:0.375rem; overflow:hidden;">
+          <img src="${image}" alt="${alt}" style="width:100%; object-fit:cover;" loading="eager" />
+        </div>`;
+      }
+      html += `<div style="font-size:0.875rem; color:white; font-family:var(--font-sans, sans-serif);">${def}</div>`;
+      if (link) {
+        if (isMobile()) {
+          html += `<div style="margin-top:0.75rem; text-align:center;">
+            <a href="${link}" target="_blank" rel="noopener noreferrer" style="font-size:0.875rem; color:#60a5fa; text-decoration:underline;" onclick="event.stopPropagation()">Click here to learn more</a>
+          </div>`;
+        } else {
+          html += `<div style="margin-top:0.5rem;">
+            <a href="${link}" target="_blank" rel="noopener noreferrer" style="font-size:0.75rem; color:#a1a1aa; text-decoration:underline;" onclick="event.stopPropagation()">Learn more →</a>
+          </div>`;
+        }
+      }
+      return html;
+    }
+
+    function positionTip(trigger: HTMLElement) {
+      const rect = trigger.getBoundingClientRect();
+      const tipRect = tip.getBoundingClientRect();
+      const spacing = 12;
+
+      let top = rect.top - tipRect.height - spacing;
+      if (top < 10) top = rect.bottom + spacing;
+
+      let left = rect.left + rect.width / 2 - tipRect.width / 2;
+      left = Math.max(8, left);
+      if (left + tipRect.width > window.innerWidth - 8) {
+        left = window.innerWidth - tipRect.width - 8;
+      }
+
+      tip.style.top = `${top}px`;
+      tip.style.left = `${left}px`;
+    }
+
+    function showTip(trigger: HTMLElement) {
+      currentTrigger = trigger;
+      cancelHide();
+      tip.innerHTML = buildTooltipHTML(trigger);
+      tip.style.display = "block";
+      tip.style.animation = "tooltipFadeInUp 0.2s forwards";
+      // Position after render (text-only tooltips are ready immediately)
+      requestAnimationFrame(() => positionTip(trigger));
+      // Re-position after image loads (image height wasn't available above)
+      const img = tip.querySelector("img");
+      if (img) {
+        img.addEventListener("load", () => {
+          if (currentTrigger === trigger) positionTip(trigger);
+        }, { once: true });
+      }
+    }
+
+    function hideTip() {
+      cancelHide();
+      hideTimer = setTimeout(() => {
+        hideTimer = null;
+        tip.style.animation = "tooltipFadeOutDown 0.15s forwards";
+        animTimer = setTimeout(() => {
+          animTimer = null;
+          tip.style.display = "none";
+          tip.style.animation = "";
+          currentTrigger = null;
+        }, 150);
+      }, 300);
+    }
+
+    // Desktop: hover
+    document.addEventListener("mouseover", (e) => {
+      if (isMobile()) return;
+      const trigger = (e.target as Element).closest?.(".tooltip-trigger") as HTMLElement | null;
+      if (trigger) showTip(trigger);
+    });
+
+    document.addEventListener("mouseout", (e) => {
+      if (isMobile()) return;
+      const trigger = (e.target as Element).closest?.(".tooltip-trigger") as HTMLElement | null;
+      if (trigger && !tip.contains(e.relatedTarget as Node)) hideTip();
+    });
+
+    tip.addEventListener("mouseenter", cancelHide);
+    tip.addEventListener("mouseleave", hideTip);
+
+    // Desktop: click opens link
+    document.addEventListener("click", (e) => {
+      const trigger = (e.target as Element).closest?.(".tooltip-trigger") as HTMLElement | null;
+      if (trigger) {
+        if (isMobile()) {
+          if (currentTrigger === trigger && tip.style.display !== "none") {
+            hideTip();
+          } else {
+            showTip(trigger);
+          }
+        } else {
+          const link = trigger.dataset.link;
+          if (link) window.open(link, "_blank", "noopener,noreferrer");
+        }
+        return;
+      }
+      if (!tip.contains(e.target as Node) && isMobile()) {
+        tip.style.display = "none";
+        currentTrigger = null;
+      }
+    });
+
+    // Keyboard accessibility
+    document.addEventListener("keydown", (e) => {
+      const trigger = (e.target as Element).closest?.(".tooltip-trigger") as HTMLElement | null;
+      if (trigger && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        if (currentTrigger === trigger && tip.style.display !== "none") {
+          hideTip();
+        } else {
+          showTip(trigger);
+        }
+      }
+      if (e.key === "Escape" && tip.style.display !== "none") {
+        tip.style.display = "none";
+        currentTrigger = null;
+      }
+    });
+
+    // Reposition on scroll/resize
+    window.addEventListener("scroll", () => {
+      if (!currentTrigger || tip.style.display === "none") return;
+      if (isMobile()) {
+        tip.style.display = "none";
+        currentTrigger = null;
+      } else {
+        positionTip(currentTrigger);
+      }
+    }, { passive: true });
+
+    window.addEventListener("resize", () => {
+      if (currentTrigger && tip.style.display !== "none") positionTip(currentTrigger);
+    }, { passive: true });
+  }
+</script>
