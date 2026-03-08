@@ -1,7 +1,9 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-const essays = [
+const blogs: { title: string; slug: string; excerpt: string; pubDate: Date; featured: boolean }[] = [];
+
+const guides = [
   {
     title: "The Mindset Revolution",
     slug: "the-mindset-revolution",
@@ -38,17 +40,78 @@ const formatDate = (d: Date) =>
 >
   <main class="max-w-5xl mx-auto px-6 md:px-8 pt-28 pb-16">
 
-    <!-- Essays -->
+    <!-- Blogs -->
+    {blogs.length > 0 && (
+      <section class="mb-16">
+        <div class="mb-8">
+          <h1 class="text-4xl md:text-5xl mb-2 text-white" style="font-family: var(--font-serif);">Blogs</h1>
+          <p class="text-zinc-400 max-w-3xl">
+            Personal writing on technology, ideas, and everything in between.
+          </p>
+        </div>
+
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {blogs.map((p) => (
+            <li>
+              {p.featured ? (
+                <div
+                  class="relative rounded-2xl p-[1.5px]"
+                  style="background: linear-gradient(90deg, #4C1D95, #7C3AED, #1E40AF);"
+                >
+                  <a
+                    href={`/content/${p.slug}`}
+                    class="group relative block h-full rounded-2xl bg-black hover:bg-white/10 transition-colors duration-300 p-6 focus:outline-none focus:ring-2 focus:ring-zinc-400/40"
+                  >
+                    <div class="flex items-start justify-between gap-4">
+                      <h2 class="text-lg md:text-xl font-semibold text-white group-hover:text-white/90">
+                        {p.title}
+                      </h2>
+                      <span class="shrink-0 text-xs text-zinc-400 mt-1">{formatDate(p.pubDate)}</span>
+                    </div>
+                    {p.excerpt && (
+                      <p class="mt-2 text-sm text-zinc-400 leading-relaxed">{p.excerpt}</p>
+                    )}
+                    <div class="mt-4 text-xs text-zinc-400 opacity-80 group-hover:opacity-100 transition-opacity">
+                      Read &rarr;
+                    </div>
+                  </a>
+                </div>
+              ) : (
+                <a
+                  href={`/content/${p.slug}`}
+                  class="group block h-full rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors duration-300 p-6 focus:outline-none focus:ring-2 focus:ring-zinc-400/40"
+                >
+                  <div class="flex items-start justify-between gap-4">
+                    <h2 class="text-lg md:text-xl font-semibold text-white group-hover:text-white/90">
+                      {p.title}
+                    </h2>
+                    <span class="shrink-0 text-xs text-zinc-400 mt-1">{formatDate(p.pubDate)}</span>
+                  </div>
+                  {p.excerpt && (
+                    <p class="mt-2 text-sm text-zinc-400 leading-relaxed">{p.excerpt}</p>
+                  )}
+                  <div class="mt-4 text-xs text-zinc-400 opacity-80 group-hover:opacity-100 transition-opacity">
+                    Read &rarr;
+                  </div>
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <!-- Guides -->
     <section class="mb-16">
       <div class="mb-8">
-        <h1 class="text-4xl md:text-5xl mb-2 text-white" style="font-family: var(--font-serif);">Essays</h1>
+        <h1 class="text-4xl md:text-5xl mb-2 text-white" style="font-family: var(--font-serif);">Guides</h1>
         <p class="text-zinc-400 max-w-3xl">
           Frameworks on learning, cognition, and building better mental models in the age of AI.
         </p>
       </div>
 
       <ul class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-        {essays.map((p) => (
+        {guides.map((p) => (
           <li>
             {p.featured ? (
               <div
