@@ -20,6 +20,16 @@ const guides = [
   },
 ];
 
+const conversations = [
+  {
+    title: "Vol. 1 — The Laptop Fix",
+    slug: "3am-vol1-the-laptop-fix",
+    excerpt: "Started with a malfunctioning HP laptop at 2:48 AM. Ended somewhere between AI economics, quant finance, and who actually benefits from all this. Unfiltered.",
+    pubDate: new Date("2026-03-23T00:00:00.000Z"),
+    featured: true,
+  },
+];
+
 const articles = [
   {
     title: "A unique perspective on Neuromancer by William Gibson",
@@ -137,6 +147,70 @@ const formatDate = (d: Date) =>
                   <div class="pointer-events-none absolute inset-0 z-10 rounded-2xl bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <span class="px-3 py-1 rounded-full text-xs md:text-sm font-semibold uppercase tracking-wide text-white/95 bg-black/40 backdrop-blur-sm">
                       Start here
+                    </span>
+                  </div>
+                </a>
+              </div>
+            ) : (
+              <a
+                href={`/content/${p.slug}`}
+                class="group block h-full rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors duration-300 p-6 focus:outline-none focus:ring-2 focus:ring-zinc-400/40"
+              >
+                <div class="flex items-start justify-between gap-4">
+                  <h2 class="text-lg md:text-xl font-semibold text-white group-hover:text-white/90">
+                    {p.title}
+                  </h2>
+                  <span class="shrink-0 text-xs text-zinc-400 mt-1">{formatDate(p.pubDate)}</span>
+                </div>
+                {p.excerpt && (
+                  <p class="mt-2 text-sm text-zinc-400 leading-relaxed">{p.excerpt}</p>
+                )}
+                <div class="mt-4 text-xs text-zinc-400 opacity-80 group-hover:opacity-100 transition-opacity">
+                  Read &rarr;
+                </div>
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- 3 AM Conversations with AI -->
+    <section class="mb-16">
+      <div class="mb-8">
+        <h1 class="text-4xl md:text-5xl mb-2 text-white" style="font-family: var(--font-serif);">3 AM Conversations with AI</h1>
+        <p class="text-zinc-400 max-w-3xl">
+          Raw, unfiltered conversations that went somewhere unexpected.
+        </p>
+      </div>
+
+      <ul class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        {conversations.map((p) => (
+          <li>
+            {p.featured ? (
+              <div
+                class="relative rounded-2xl p-[1.5px]"
+                style="background: linear-gradient(90deg, #4C1D95, #7C3AED, #1E40AF);"
+              >
+                <a
+                  href={`/content/${p.slug}`}
+                  class="group relative block h-full rounded-2xl bg-black hover:bg-white/10 transition-colors duration-300 p-6 focus:outline-none focus:ring-2 focus:ring-zinc-400/40"
+                >
+                  <div class="flex items-start justify-between gap-4">
+                    <h2 class="text-lg md:text-xl font-semibold text-white group-hover:text-white/90">
+                      {p.title}
+                    </h2>
+                    <span class="shrink-0 text-xs text-zinc-400 mt-1">{formatDate(p.pubDate)}</span>
+                  </div>
+                  {p.excerpt && (
+                    <p class="mt-2 text-sm text-zinc-400 leading-relaxed">{p.excerpt}</p>
+                  )}
+                  <div class="mt-4 text-xs text-zinc-400 opacity-80 group-hover:opacity-100 transition-opacity">
+                    Read &rarr;
+                  </div>
+                  <div class="pointer-events-none absolute inset-0 z-10 rounded-2xl bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <span class="px-3 py-1 rounded-full text-xs md:text-sm font-semibold uppercase tracking-wide text-white/95 bg-black/40 backdrop-blur-sm">
+                      3 AM
                     </span>
                   </div>
                 </a>
