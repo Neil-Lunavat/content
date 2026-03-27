@@ -36,6 +36,13 @@ export async function GET(context: APIContext) {
           "Started debugging a throttled HP laptop at 3 AM with Claude. Then the conversation went somewhere else entirely — AI economics, job markets, quant finance, and who actually benefits from all this.",
         link: "/content/3am-vol1-the-laptop-fix",
       },
+      {
+        title: "3 AM Conversations with AI, Vol. 2 — The Gear Shift",
+        pubDate: new Date("2026-03-25"),
+        description:
+          "A bike gear analogy turned into a full framework for skill acquisition — logarithmic curves, boredom as a signal, and why grinding the wrong coefficient is the most common plateau.",
+        link: "/content/3am-vol2-the-gear-shift",
+      },
     ],
     customData: `<language>en-us</language>`,
   });

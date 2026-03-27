@@ -17,10 +17,10 @@ You never touch this file when writing a post. You just fill in the frontmatter 
 ### 1. Create the file
 
 ```
-src/pages/blog/your-post-slug.mdx
+src/pages/content/your-post-slug.mdx
 ```
 
-The filename becomes the URL: `/blog/your-post-slug`
+The filename becomes the URL: `/content/your-post-slug`
 
 ---
 
@@ -145,7 +145,7 @@ Copy and adjust at the bottom of every post:
 
 Add it to **two** places so it appears in the listing and RSS feed:
 
-**`src/pages/blog/index.astro`** — add to the `posts` array:
+**`src/pages/content/index.astro`** — add to the relevant array (`blogs`, `guides`, `conversations`, or `articles`):
 ```js
 {
   title: "Your Post Title",
@@ -162,7 +162,7 @@ Add it to **two** places so it appears in the listing and RSS feed:
   title: "Your Post Title",
   pubDate: new Date("YYYY-MM-DD"),
   description: "One line description.",
-  link: "/blog/your-post-slug",
+  link: "/content/your-post-slug",
 },
 ```
 
@@ -170,11 +170,11 @@ Add it to **two** places so it appears in the listing and RSS feed:
 
 ## Checklist
 
-- [ ] File created at `src/pages/blog/your-slug.mdx`
+- [ ] File created at `src/pages/content/your-slug.mdx`
 - [ ] Frontmatter filled in (all fields)
 - [ ] TOC ids match section ids
 - [ ] Tooltip paragraphs wrapped in `<p>` tags
 - [ ] `&` in URLs written as `&amp;`
-- [ ] Post added to `blog/index.astro`
+- [ ] Post added to `content/index.astro` (correct array)
 - [ ] Post added to `rss.xml.ts`
 - [ ] Run `bun run dev` and check it looks right
