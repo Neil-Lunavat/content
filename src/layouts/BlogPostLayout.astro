@@ -10,7 +10,7 @@ interface Props {
     description?: string;
     ogImage?: string;
     heroTitle: string;
-    subtitle: string;
+    subtitle?: string;
     pubDate: string;
     readTime: number;
     toc?: { id: string; text: string }[];
@@ -52,9 +52,11 @@ const pubDate = new Date(frontmatter.pubDate);
                 {frontmatter.heroTitle}
               </GradientText>
             </h1>
-            <h2 class="text-3xl mb-6 text-center text-zinc-300" style="font-family: var(--font-serif);">
-              {frontmatter.subtitle}
-            </h2>
+            {frontmatter.subtitle && (
+              <h2 class="text-3xl mb-6 text-center text-zinc-300" style="font-family: var(--font-serif);">
+                {frontmatter.subtitle}
+              </h2>
+            )}
 
             <article class="mt-12 text-zinc-200 leading-relaxed text-lg space-y-6">
               <slot />

@@ -1,0 +1,70 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getEnv, requireEnv } from "../../lib/env";
+import { readLogs, type LogEntry } from "../../lib/sheets";
+
+export const prerender = false;
+
+const requested = Number(Astro.params.number);
+
+let log: LogEntry | undefined;
+let error: string | null = null;
+
+if (!Number.isInteger(requested) || requested < 1) {
+  return new Response("Not found", { status: 404 });
+}
+
+try {
+  const env = getEnv(Astro.locals);
+  requireEnv(env);
+  log = (await readLogs(env)).find((entry) => entry.number === requested);
+} catch (err) {
+  error = (err as Error).message;
+}
+
+if (!error && !log) {
+  return new Response("Not found", { status: 404 });
+}
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "2-digit" });
+---
+
+<BaseLayout
+  title={log ? `#${log.number} ${log.title} | Logs` : "Logs | Neil Lunavat"}
+  description={log?.title}
+>
+  <main class="max-w-3xl mx-auto px-6 md:px-8 pt-28 pb-16">
+
+    {error && (
+      <div class="rounded-xl border border-red-900/60 bg-red-950/30 p-6 text-sm text-red-200">
+        <p class="font-semibold mb-2">Couldn't load this log.</p>
+        <p class="text-red-300/80 leading-relaxed">{error}</p>
+      </div>
+    )}
+
+    {log && (
+      <article>
+        <h1 class="text-3xl md:text-4xl text-white mb-2" style="font-family: var(--font-serif);">
+          <span class="text-zinc-500">#{log.number}</span> {log.title}
+        </h1>
+        <div class="text-sm text-zinc-400 mb-10">{formatDate(log.date)}</div>
+
+        <!-- whitespace-pre-wrap keeps the line breaks exactly as typed; the
+             body is plain text and is never parsed as markup. -->
+        <div class="text-zinc-200 text-lg leading-relaxed whitespace-pre-wrap">{log.body}</div>
+      </article>
+    )}
+
+    <div class="pt-8 border-t border-zinc-800 mt-12">
+      <a
+        href="/logs"
+        class="inline-flex items-center justify-center px-6 py-2 border border-zinc-700 rounded-md text-sm uppercase tracking-wider text-white bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-all duration-200"
+        style="font-family: var(--font-sans);"
+      >
+        All logs
+      </a>
+    </div>
+
+  </main>
+</BaseLayout>

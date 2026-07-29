@@ -1,6 +1,19 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import GradientText from "../components/ui/GradientText.astro";
+
+const destinations = [
+  {
+    label: "Read logs",
+    href: "/logs",
+    description: "my life, zoomed in and zoomed out",
+  },
+  {
+    label: "Read material",
+    href: "/content",
+    description: "blogs, guides, conversations with AI, literary analyses",
+  },
+];
 ---
 
 <BaseLayout
@@ -9,18 +22,48 @@ import GradientText from "../components/ui/GradientText.astro";
 >
   <div class="bg-black text-white">
 
-    <section class="min-h-screen flex flex-col items-center justify-center text-center px-6 md:px-12">
-      <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-10" style="font-family: var(--font-serif);">
-        Hi, I'm Neil
-      </h1>
+    <section class="min-h-screen flex flex-col justify-center px-6 md:px-12 py-28">
+      <div class="max-w-3xl mx-auto">
 
-      <a href="/content" class="inline-block" aria-label="Explore all posts">
-        <span class="inline-flex items-center justify-center px-8 py-3 border border-zinc-700 rounded-md text-sm uppercase tracking-wider bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-all duration-200" style="font-family: var(--font-sans);">
-          <GradientText colors={["#8DE5FF", "#A0B8FF", "#BFA0FF", "#8DE5FF"]} animationSpeed={3}>
-            Explore Posts
-          </GradientText>
-        </span>
-      </a>
+        <h1 class="text-4xl md:text-5xl mb-10" style="font-family: var(--font-serif);">
+          Hello there, I'm Neil.
+        </h1>
+
+        <p class="text-lg md:text-xl text-zinc-300 leading-relaxed mb-12">
+          I am a student of life, a researcher and a friend.<br />
+          This website is a relic I visit rather infrequently.<br />
+          I try to capture, in detail, my journey through life.<br />
+          My struggles and shortcomings, my wins and triumphs.<br />
+          But more importantly, my learnings.<br />
+          And maybe in voicing my story to the world,<br />
+          I help you become the ideal version of yourself.<br />
+          And <i>that</i> would be far more valuable than any<br />
+          achievement I could imagine accomplishing by myself.<br />
+          I would've told you to subscribe to a newsletter I have,<br />
+          but honestly I don't know the next time I will write something here.<br />
+          Nevertheless, I suggest bookmarking this site in case you forget.
+        </p>
+
+        <div class="grid sm:grid-cols-2 gap-8">
+          {destinations.map((d) => (
+            <div>
+              <a
+                href={d.href}
+                class="inline-flex items-center justify-center px-6 py-2 border border-zinc-700 rounded-md text-sm uppercase tracking-wider bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-all duration-200"
+                style="font-family: var(--font-sans);"
+              >
+                <GradientText colors={["#8DE5FF", "#A0B8FF", "#BFA0FF", "#8DE5FF"]} animationSpeed={3}>
+                  {d.label}
+                </GradientText>
+              </a>
+              <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+                {d.description}
+              </p>
+            </div>
+          ))}
+        </div>
+
+      </div>
     </section>
 
   </div>

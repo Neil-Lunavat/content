@@ -160,9 +160,10 @@ Entry shape (same for all four):
   slug: "your-post-slug",
   excerpt: "One line description.",
   pubDate: new Date("YYYY-MM-DDT00:00:00.000Z"),
-  featured: false, // true shows the card with a gradient border
 },
 ```
+
+All cards render through `src/components/ui/PostCard.astro`, so every entry looks the same — there's no per-post styling flag. Change that component to restyle every card on the page at once.
 
 The `blogs` array is typed explicitly, so if you add the first entry there, keep the fields matching its type annotation.
 

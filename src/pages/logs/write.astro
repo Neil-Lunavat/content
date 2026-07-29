@@ -1,0 +1,153 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// No server data is needed to render the shell, so this page is prerendered.
+// The passkey is checked by /api/logs/verify and again by /api/logs on submit.
+---
+
+<BaseLayout title="Write a log" description="Write a log.">
+  <main class="max-w-3xl mx-auto px-6 md:px-8 pt-28 pb-16">
+
+    <h1 class="text-4xl md:text-5xl mb-8 text-white" style="font-family: var(--font-serif);">
+      Write a log
+    </h1>
+
+    <!-- Step 1: passkey -->
+    <form id="gate" class="max-w-sm">
+      <label for="passkey" class="block text-sm text-zinc-400 mb-2">Passkey</label>
+      <input
+        id="passkey"
+        type="password"
+        autocomplete="current-password"
+        required
+        class="w-full rounded-lg bg-white/5 px-4 py-2 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-400/40"
+      />
+      <button
+        type="submit"
+        class="mt-4 inline-flex items-center justify-center px-6 py-2 border border-zinc-700 rounded-md text-sm uppercase tracking-wider text-white bg-black/40 hover:bg-black/60 transition-all duration-200"
+      >
+        Unlock
+      </button>
+    </form>
+
+    <!-- Step 2: the log itself -->
+    <form id="composer" class="hidden space-y-6">
+      <div>
+        <label for="title" class="block text-sm text-zinc-400 mb-2">Title</label>
+        <input
+          id="title"
+          type="text"
+          maxlength="200"
+          required
+          class="w-full rounded-lg bg-white/5 px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-400/40"
+        />
+      </div>
+
+      <div>
+        <label for="body" class="block text-sm text-zinc-400 mb-2">Body</label>
+        <textarea
+          id="body"
+          rows="18"
+          required
+          class="w-full rounded-lg bg-white/5 px-4 py-3 text-white placeholder-zinc-600 leading-relaxed focus:outline-none focus:ring-2 focus:ring-zinc-400/40"
+        ></textarea>
+        <p class="mt-2 text-xs text-zinc-500">
+          Plain text. Line breaks are kept; nothing else is formatted.
+        </p>
+      </div>
+
+      <button
+        type="submit"
+        id="publish"
+        class="inline-flex items-center justify-center px-6 py-2 border border-zinc-700 rounded-md text-sm uppercase tracking-wider text-white bg-black/40 hover:bg-black/60 transition-all duration-200 disabled:opacity-50"
+      >
+        Publish
+      </button>
+    </form>
+
+    <p id="status" class="mt-6 text-sm hidden"></p>
+
+  </main>
+</BaseLayout>
+
+<script>
+  const gate = document.getElementById("gate") as HTMLFormElement;
+  const composer = document.getElementById("composer") as HTMLFormElement;
+  const passkeyInput = document.getElementById("passkey") as HTMLInputElement;
+  const titleInput = document.getElementById("title") as HTMLInputElement;
+  const bodyInput = document.getElementById("body") as HTMLTextAreaElement;
+  const publish = document.getElementById("publish") as HTMLButtonElement;
+  const status = document.getElementById("status") as HTMLParagraphElement;
+
+  // Held in memory only, so it is never written to storage a later visitor
+  // could read. A refresh means entering it again, which is cheap.
+  let passkey = "";
+
+  function say(message: string, tone: "error" | "ok" | "muted") {
+    status.textContent = message;
+    status.className = `mt-6 text-sm ${
+      tone === "error" ? "text-red-400" : tone === "ok" ? "text-emerald-400" : "text-zinc-400"
+    }`;
+  }
+
+  gate.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    say("Checking...", "muted");
+
+    try {
+      const res = await fetch("/api/logs/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passkey: passkeyInput.value }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        say(data.error ?? "Wrong passkey.", "error");
+        return;
+      }
+
+      passkey = passkeyInput.value;
+      passkeyInput.value = "";
+      gate.classList.add("hidden");
+      composer.classList.remove("hidden");
+      status.classList.add("hidden");
+      titleInput.focus();
+    } catch {
+      say("Could not reach the server.", "error");
+    }
+  });
+
+  composer.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    publish.disabled = true;
+    say("Publishing...", "muted");
+
+    try {
+      const res = await fetch("/api/logs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          passkey,
+          title: titleInput.value,
+          body: bodyInput.value,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        say(data.error ?? "Something went wrong.", "error");
+        return;
+      }
+
+      titleInput.value = "";
+      bodyInput.value = "";
+      say(`Published as #${data.number}. View it at /logs.`, "ok");
+      titleInput.focus();
+    } catch {
+      say("Could not reach the server.", "error");
+    } finally {
+      publish.disabled = false;
+    }
+  });
+</script>
