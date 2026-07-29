@@ -13,7 +13,7 @@ interface Props {
     subtitle: string;
     pubDate: string;
     readTime: number;
-    toc: { id: string; text: string }[];
+    toc?: { id: string; text: string }[];
   };
 }
 
@@ -32,7 +32,9 @@ const pubDate = new Date(frontmatter.pubDate);
       <!-- Left: TOC -->
       <div class="hidden lg:block m-10">
         <div class="sticky top-24">
-          <BlogNav toc={frontmatter.toc} />
+          {frontmatter.toc && frontmatter.toc.length > 0 && (
+            <BlogNav toc={frontmatter.toc} />
+          )}
         </div>
       </div>
 

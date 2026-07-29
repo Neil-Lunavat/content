@@ -36,6 +36,13 @@ export async function GET(context: APIContext) {
           "Started debugging a throttled HP laptop at 3 AM with Claude. Then the conversation went somewhere else entirely — AI economics, job markets, quant finance, and who actually benefits from all this.",
         link: "/content/3am-vol1-the-laptop-fix",
       },
+      {
+        title: "A letter to Artificial Intelligence",
+        pubDate: new Date("2026-07-29"),
+        description:
+          "A poem about why we build machines that think — and what we're really reaching for.",
+        link: "/content/a-letter-to-artificial-intelligence",
+      },
     ],
     customData: `<language>en-us</language>`,
   });

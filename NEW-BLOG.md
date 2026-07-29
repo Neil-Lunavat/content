@@ -1,4 +1,4 @@
-# How to Write a New Blog Post
+# How to Write a New Post
 
 ## What is BlogPostLayout?
 
@@ -17,10 +17,10 @@ You never touch this file when writing a post. You just fill in the frontmatter 
 ### 1. Create the file
 
 ```
-src/pages/blog/your-post-slug.mdx
+src/pages/content/your-post-slug.mdx
 ```
 
-The filename becomes the URL: `/blog/your-post-slug`
+The filename becomes the URL: `/content/your-post-slug`
 
 ---
 
@@ -45,7 +45,7 @@ toc:
 
 - `title` — SEO only, not shown on page
 - `heroTitle` — what readers actually see as the main heading
-- `subtitle` — shown below heroTitle (e.g. "The Mindset Revolution")
+- `subtitle` — shown below heroTitle (e.g. "3 AM Conversations with AI, Vol. 1")
 - `toc` ids must exactly match the `id` attributes on your `<section>` tags
 
 ---
@@ -64,17 +64,15 @@ import GradientText from '../../components/ui/GradientText.astro';
 Plain paragraphs and headings are just markdown:
 
 ```md
-## Not needed — use section tags instead (see below)
-
 Regular paragraph text just like this. **Bold** and _italic_ work normally.
 ```
 
 Wrap each section in a `<section>` tag with an id matching your TOC:
 
 ```mdx
-<section id="section-slug" class="space-y-4">
+<section id="section-slug" class="space-y-6">
 
-<h3 class="text-2xl font-semibold text-zinc-100">Section Title</h3>
+<h3 class="text-3xl text-zinc-100" style="font-family: var(--font-serif);">Section Title</h3>
 
 Plain paragraph text here.
 
@@ -125,12 +123,12 @@ Copy and adjust at the bottom of every post:
 
 ```mdx
 <div class="pt-8 border-t border-zinc-800 mt-12">
-  <div class="text-zinc-400 italic mb-6 text-center" style="font-family: var(--font-serif);">
+  <div class="text-zinc-400 italic mb-6 text-center text-sm" style="font-family: var(--font-sans);">
     Series note or closing line here.
   </div>
   <div class="grid grid-cols-3 items-center gap-4">
-    <a href="/" class="justify-self-start inline-flex items-center justify-center px-6 py-2 border border-zinc-700 rounded-md text-sm uppercase tracking-wider text-white bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-all duration-200" style="font-family: var(--font-serif);">
-      <GradientText colors={["#8DE5FF", "#A0B8FF", "#BFA0FF", "#8DE5FF"]} animationSpeed={3}>Back to Home</GradientText>
+    <a href="/content" class="justify-self-start inline-flex items-center justify-center px-6 py-2 border border-zinc-700 rounded-md text-sm uppercase tracking-wider text-white bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-all duration-200" style="font-family: var(--font-sans);">
+      <GradientText colors={["#8DE5FF", "#A0B8FF", "#BFA0FF", "#8DE5FF"]} animationSpeed={3}>All Posts</GradientText>
     </a>
     <div></div>
     <!-- Add a next-post link here if there's a Part 2, otherwise leave as <div></div> -->
@@ -143,26 +141,37 @@ Copy and adjust at the bottom of every post:
 
 ### 8. Register the post
 
-Add it to **two** places so it appears in the listing and RSS feed:
+Add it to **two** places so it appears in the listing and RSS feed.
 
-**`src/pages/blog/index.astro`** — add to the `posts` array:
+**`src/pages/content/index.astro`** — there is no single `posts` array. There are four category arrays at the top of the frontmatter. Pick the one your post belongs to:
+
+| Array | Section heading on the page | What goes here |
+|---|---|---|
+| `blogs` | Blogs | Personal writing on tech and ideas. Currently empty — the section is hidden until it has at least one entry |
+| `guides` | Guides | Frameworks on learning, cognition, mental models |
+| `conversations` | 3 AM Conversations with AI | Entries in the transcript series |
+| `articles` | Articles | Standalone essays and reviews |
+
+Entry shape (same for all four):
 ```js
 {
   title: "Your Post Title",
   slug: "your-post-slug",
   excerpt: "One line description.",
-  pubDate: new Date("YYYY-MM-DD"),
-  featured: false, // set true to show with gradient border
+  pubDate: new Date("YYYY-MM-DDT00:00:00.000Z"),
+  featured: false, // true shows the card with a gradient border
 },
 ```
 
-**`src/pages/rss.xml.ts`** — add to the `items` array:
+The `blogs` array is typed explicitly, so if you add the first entry there, keep the fields matching its type annotation.
+
+**`src/pages/rss.xml.ts`** — add to the `items` array (note the `/content/` link prefix):
 ```js
 {
   title: "Your Post Title",
   pubDate: new Date("YYYY-MM-DD"),
   description: "One line description.",
-  link: "/blog/your-post-slug",
+  link: "/content/your-post-slug",
 },
 ```
 
@@ -170,11 +179,11 @@ Add it to **two** places so it appears in the listing and RSS feed:
 
 ## Checklist
 
-- [ ] File created at `src/pages/blog/your-slug.mdx`
+- [ ] File created at `src/pages/content/your-slug.mdx`
 - [ ] Frontmatter filled in (all fields)
 - [ ] TOC ids match section ids
 - [ ] Tooltip paragraphs wrapped in `<p>` tags
 - [ ] `&` in URLs written as `&amp;`
-- [ ] Post added to `blog/index.astro`
-- [ ] Post added to `rss.xml.ts`
+- [ ] Post added to the right category array in `content/index.astro`
+- [ ] Post added to `rss.xml.ts` with a `/content/` link
 - [ ] Run `bun run dev` and check it looks right
