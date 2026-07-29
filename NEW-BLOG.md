@@ -47,6 +47,7 @@ toc:
 - `heroTitle` — what readers actually see as the main heading
 - `subtitle` — shown below heroTitle (e.g. "3 AM Conversations with AI, Vol. 1")
 - `toc` ids must exactly match the `id` attributes on your `<section>` tags
+- `toc` is **optional** — leave it out entirely for short pieces (poems, single-idea posts) and the sidebar simply won't render. Everything else stays centered as normal.
 
 ---
 
@@ -181,7 +182,7 @@ The `blogs` array is typed explicitly, so if you add the first entry there, keep
 
 - [ ] File created at `src/pages/content/your-slug.mdx`
 - [ ] Frontmatter filled in (all fields)
-- [ ] TOC ids match section ids
+- [ ] TOC ids match section ids (or `toc` omitted entirely)
 - [ ] Tooltip paragraphs wrapped in `<p>` tags
 - [ ] `&` in URLs written as `&amp;`
 - [ ] Post added to the right category array in `content/index.astro`
