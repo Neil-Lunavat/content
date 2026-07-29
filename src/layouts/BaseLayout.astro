@@ -11,9 +11,20 @@ interface Props {
   ogImage?: string;
   canonical?: string;
   bodyClass?: string;
+  /** "article" switches og:type and emits BlogPosting structured data. */
+  pageType?: "website" | "article";
+  pubDate?: Date | string;
 }
 
-const { title, description, ogImage, canonical, bodyClass = "dotted-bg" } = Astro.props;
+const {
+  title,
+  description,
+  ogImage,
+  canonical,
+  bodyClass = "dotted-bg",
+  pageType,
+  pubDate,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -22,15 +33,26 @@ const { title, description, ogImage, canonical, bodyClass = "dotted-bg" } = Astr
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0a0a0a" />
-    <SEO title={title} description={description} ogImage={ogImage} canonical={canonical} />
+    <SEO
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      canonical={canonical}
+      pageType={pageType}
+      pubDate={pubDate}
+    />
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
     <link rel="manifest" href="/favicon/site.webmanifest" />
     <link rel="shortcut icon" href="/favicon/favicon.ico" />
-    <!-- Preload key assets -->
-    <link rel="preload" href="/logo.png" as="image" type="image/png" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Neil Lunavat"
+      href="/rss.xml"
+    />
     <slot name="head" />
   </head>
   <body class:list={["min-h-screen flex flex-col antialiased", bodyClass]}>

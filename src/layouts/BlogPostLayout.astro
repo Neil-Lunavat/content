@@ -25,6 +25,8 @@ const pubDate = new Date(frontmatter.pubDate);
   title={frontmatter.title}
   description={frontmatter.description}
   ogImage={frontmatter.ogImage}
+  pageType="article"
+  pubDate={pubDate}
 >
   <div class="relative min-h-screen px-0 py-24 w-full">
     <div class="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr_1fr] gap-0 w-full mx-auto">

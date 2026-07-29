@@ -4,23 +4,91 @@ interface Props {
   description?: string;
   ogImage?: string;
   canonical?: string;
+  /** "article" switches og:type and emits BlogPosting structured data. */
+  pageType?: "website" | "article";
+  /** Publication date — only used when pageType is "article". */
+  pubDate?: Date | string;
 }
+
+const SITE_NAME = "Neil Lunavat";
+const PROFILES = [
+  "https://linkedin.com/in/neil-lunavat",
+  "https://github.com/neil-lunavat",
+  "https://instagram.com/uhh_neil",
+];
 
 const {
   title = "Neil Lunavat | Developer & Digital Polymath",
   description = "Exploring the intersection of AI, development, and human potential. Practical insights for builders navigating the age of artificial intelligence.",
   ogImage = "/logo.png",
   canonical,
+  pageType = "website",
+  pubDate,
 } = Astro.props;
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, "") ?? "";
-const canonicalUrl = canonical ?? Astro.url.href;
+
+// Built from the path, never Astro.url.href: including the query string would
+// give ?utm_source=x a different canonical than the clean URL, which is the
+// exact duplication canonicals exist to prevent.
+const canonicalUrl = canonical ?? `${siteUrl}${Astro.url.pathname}`;
+
 const fullOgImage = ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`;
+
+const parsedDate = pubDate ? new Date(pubDate) : undefined;
+const publishedISO =
+  parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate.toISOString() : undefined;
+
+const person = {
+  "@type": "Person",
+  "@id": `${siteUrl}/#person`,
+  name: SITE_NAME,
+  url: `${siteUrl}/`,
+  sameAs: PROFILES,
+};
+
+const isArticle = pageType === "article";
+const isHome = Astro.url.pathname === "/";
+
+const structuredData = isArticle
+  ? {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: title,
+      description,
+      url: canonicalUrl,
+      image: fullOgImage,
+      author: person,
+      publisher: person,
+      mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+      ...(publishedISO ? { datePublished: publishedISO, dateModified: publishedISO } : {}),
+    }
+  : isHome
+    ? {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": `${siteUrl}/#website`,
+            url: `${siteUrl}/`,
+            name: SITE_NAME,
+            description,
+            publisher: { "@id": `${siteUrl}/#person` },
+          },
+          person,
+        ],
+      }
+    : null;
+
+// Escaping "<" stops a stray "</script>" inside a title or description from
+// closing the tag early.
+const structuredDataJson = structuredData
+  ? JSON.stringify(structuredData).replace(/</g, "\\u003c")
+  : null;
 ---
 
 <title>{title}</title>
 <meta name="description" content={description} />
-<meta name="keywords" content="AI automation, productivity, polymath, software development, digital polymath, context engineering, AI insights, developer insights, interdisciplinary thinking" />
 <meta name="author" content="Neil Lunavat" />
 <meta name="robots" content="index, follow" />
 <link rel="canonical" href={canonicalUrl} />
@@ -28,13 +96,22 @@ const fullOgImage = ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}
 <!-- Open Graph -->
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:type" content="website" />
+<meta property="og:type" content={isArticle ? "article" : "website"} />
 <meta property="og:url" content={canonicalUrl} />
 <meta property="og:image" content={fullOgImage} />
+<meta property="og:site_name" content={SITE_NAME} />
 <meta property="og:locale" content="en_US" />
+{isArticle && publishedISO && (
+  <meta property="article:published_time" content={publishedISO} />
+)}
+{isArticle && <meta property="article:author" content={SITE_NAME} />}
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={fullOgImage} />
+
+{structuredDataJson && (
+  <script type="application/ld+json" set:html={structuredDataJson} />
+)}
